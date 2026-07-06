@@ -28,7 +28,7 @@ Arquivos em `knowledge/raw/` são fontes brutas e não devem ser tratados como d
 - `knowledge/curated/`: material intermediário revisado.
 - `.agents/skills/`: skills do agente.
 - `.agents/templates/`: templates oficiais.
-- `scripts/`: automações.
+- `scripts/`: scripts úteis para o projeto.
 
 ## Critérios de saída
 
