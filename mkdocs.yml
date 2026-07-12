@@ -1,0 +1,44 @@
+site_name: Wiki Central do Projeto
+site_description: Base de conhecimento operacional, técnica e funcional
+repo_url: https://exemplo/repositorio
+
+theme:
+  name: material
+  language: pt-BR
+  features:
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+
+nav:
+  - Início: index.md
+  - Negócio:
+      - Visão Geral: negocio/visao-geral.md
+      - Glossário: glossario/index.md
+  - Processos:
+      - Operacionais: processos/index.md
+      - Fluxos: fluxos/index.md
+  - Sistemas:
+      - Visão Geral: sistemas/index.md
+  - Integrações:
+      - APIs: integracoes/apis.md
+      - XML: integracoes/xml.md
+      - Mapeamentos: integracoes/mapeamentos.md
+  - FAQ:
+      - Perguntas Frequentes: faq/index.md
+  - Decisões:
+      - ADRs: decisoes/index.md
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - toc:
+      permalink: true
+  - tables
+  - attr_list
+  - def_list

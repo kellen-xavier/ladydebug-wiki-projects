@@ -1,0 +1,5 @@
+# .ai-memory.toml
+
+workspace = "documentacao-corporativa"
+project = "repo-conhecimento-base"
+project_strategy = "repo-root"

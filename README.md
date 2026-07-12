@@ -10,6 +10,22 @@ Este repositório tem o intuíto de ponto de partida de organização de documen
 
 Ter uma base inícial "template" para copiar e adicionar no projeto, com fontes e referências de estudos voltado para wiki em projetos.
 
+Técnico:
+
+- acessa Git, Markdown, Codex, scripts, histórico, PRs.
+
+Não técnico:
+
+- acessa a wiki publicada, navegação, glossário, FAQ e busca com IA.
+
+---
+
+## Estrutura
+
+.agents/skills/wiki-writer/SKILL.md
+
+---
+
 ## Referências
 
 - [Documentação AI CODEX](https://developers.openai.com/)
