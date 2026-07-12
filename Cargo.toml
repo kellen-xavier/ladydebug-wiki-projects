@@ -1,0 +1,18 @@
+[package]
+name = "md2docx"
+version = "0.1.0"
+edition = "2021"
+description = "Converte Markdown para DOCX preservando conteudo e indentacao (verbatim)"
+
+[[bin]]
+name = "md2docx"
+path = "src/main.rs"
+
+[dependencies]
+zip = { version = "0.6", default-features = false, features = ["deflate"] }
+
+[profile.release]
+opt-level = "z"
+lto = true
+strip = true
+panic = "abort"
