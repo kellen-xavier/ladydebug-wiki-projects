@@ -32,23 +32,18 @@ Programa Rust autocontido, **sem dependências externas** (apenas a `std`). Um
 
 ## Build (uma vez)
 
-Via Cargo (padrão do repositório) — adicione o alvo ao `Cargo.toml`:
-
-```toml
-[[bin]]
-name = "docx_to_pdf"
-path = "scripts/docx_to_pdf.rs"
-```
+Via Cargo (padrão do repositório) — o alvo já está registrado no `Cargo.toml`:
 
 ```bash
 cargo build --release
 # binário em: target/release/docx_to_pdf  (~412 KB)
 ```
 
-Como não há dependências, também pode ser compilado direto, sem Cargo:
+Como este conversor não tem dependências, também pode ser compilado direto,
+sem Cargo (informe a edition usada pelo projeto):
 
 ```bash
-rustc -O scripts/docx_to_pdf.rs -o docx_to_pdf
+rustc -O --edition 2021 scripts/docx_to_pdf.rs -o docx_to_pdf
 ```
 
 ## Uso

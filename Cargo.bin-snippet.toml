@@ -1,9 +1,0 @@
-# Adicione este alvo ao Cargo.toml do repositorio (ao lado do bin md2docx):
-[[bin]]
-name = "docx_to_pdf"
-path = "scripts/docx_to_pdf.rs"
-
-# E CORRIJA o bin existente do md2docx, cujo path aponta para um arquivo inexistente:
-#   [[bin]]
-#   name = "md2docx"
-#   path = "scripts/md2-to-docx.rs"   # <- estava "src/main.rs"

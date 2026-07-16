@@ -249,6 +249,15 @@ fn convert(soffice: &Path, input: &Path, output_dir: &Path, timeout: Duration) -
         input.to_string_lossy().into_owned(),
     ];
 
+    let stem = input.file_stem().unwrap_or_default().to_string_lossy();
+    let pdf = output_dir.join(format!("{stem}.pdf"));
+    // Remove um PDF de saida pre-existente antes de converter: assim o teste de
+    // sucesso (`pdf.is_file()`) reflete ESTA execucao, e nao um arquivo remanescente
+    // de uma conversao anterior. Sem isto, uma falha/timeout do soffice sobre um
+    // alvo ja existente seria reportada como sucesso (falso positivo). O soffice
+    // sobrescreveria esse PDF de qualquer forma, entao nao ha perda adicional.
+    let _ = fs::remove_file(&pdf);
+
     log(&format!(
         "Convertendo: {}",
         input.file_name().unwrap_or_default().to_string_lossy()
@@ -259,8 +268,6 @@ fn convert(soffice: &Path, input: &Path, output_dir: &Path, timeout: Duration) -
         Err(_) => false,
     };
 
-    let stem = input.file_stem().unwrap_or_default().to_string_lossy();
-    let pdf = output_dir.join(format!("{stem}.pdf"));
     let produced = pdf.is_file();
 
     let outcome = if produced {
