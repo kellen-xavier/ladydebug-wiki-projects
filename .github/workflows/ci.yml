@@ -1,0 +1,35 @@
+name: CI
+
+# Roda a esteira em toda PR direcionada a develop (gate antes do merge)
+# e tambem apos o merge, validando o proprio develop.
+on:
+  pull_request:
+    branches: [develop]
+  push:
+    branches: [develop]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Instalar toolchain Rust (stable)
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache do Cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build release (compila md2docx e docx_to_pdf)
+        run: cargo build --release --verbose
+
+      - name: Testes
+        run: cargo test --release --verbose
+
+      - name: Sintaxe do script Ruby
+        run: ruby -c scripts/juntar_pdfs.rb
