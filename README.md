@@ -26,6 +26,12 @@ Não técnico:
 
 ---
 
+## Histórico
+
+O que mudou a cada versão está no [CHANGELOG](CHANGELOG.md).
+
+---
+
 ## Referências
 
 - [Documentação AI CODEX](https://developers.openai.com/)
