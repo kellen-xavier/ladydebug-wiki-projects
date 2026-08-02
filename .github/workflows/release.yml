@@ -1,0 +1,106 @@
+name: release
+
+# Valida todo push e toda PR; publica versão apenas em `main`.
+#
+# O changelog NÃO é escrito nas PRs — se cada PR editasse o CHANGELOG.md, toda
+# PR conflitaria com as outras no mesmo arquivo. Nas PRs a pipeline só imprime a
+# prévia no log; quem escreve o arquivo é o job `version`, que roda apenas após
+# o merge em `main`.
+#
+# Antes da primeira execução, veja "Ativação da pipeline" no CONTRIBUTING.md.
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      version_bump:
+        description: "major | minor | patch (força o incremento)"
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Histórico completo: a prévia do changelog compara com a última tag.
+          fetch-depth: 0
+
+      - name: Compilar os binários
+        run: cargo build --release --locked
+
+      - name: Testes
+        run: cargo test --locked
+
+      - name: Sintaxe dos scripts Ruby
+        run: |
+          for arquivo in scripts/*.rb; do
+            ruby -c "$arquivo"
+          done
+
+      - name: Links internos da documentação
+        run: ruby scripts/verificar-links.rb
+
+      - name: Prévia do changelog
+        run: ruby scripts/changelog.rb previa
+
+  version:
+    needs: validate
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          # RELEASE_TOKEN só é necessário se `main` exigir PR para receber
+          # commits: o GITHUB_TOKEN padrão não fura essa proteção.
+          token: ${{ secrets.RELEASE_TOKEN || github.token }}
+
+      - name: Buscar as tags
+        run: git fetch --tags --force
+
+      - name: Calcular a versão
+        id: plano
+        env:
+          VERSION_BUMP: ${{ github.event.inputs.version_bump }}
+        run: |
+          # pipefail: sem isso, uma falha do script ficaria mascarada pelo tee.
+          set -o pipefail
+          ruby scripts/changelog.rb plano | tee -a "$GITHUB_OUTPUT"
+
+      - name: Nada a publicar
+        if: steps.plano.outputs.mudancas == '0' || steps.plano.outputs.tag_existe == 'true'
+        run: |
+          echo "Sem mudanças desde a última tag, ou a tag v${{ steps.plano.outputs.versao }} já existe."
+          echo "Encerrando sem publicar."
+
+      - name: Aplicar a versão no manifesto
+        if: steps.plano.outputs.mudancas != '0' && steps.plano.outputs.tag_existe != 'true'
+        run: ruby scripts/changelog.rb aplicar-versao "${{ steps.plano.outputs.versao }}"
+
+      - name: Regravar o CHANGELOG
+        if: steps.plano.outputs.mudancas != '0' && steps.plano.outputs.tag_existe != 'true'
+        run: ruby scripts/changelog.rb gerar "${{ steps.plano.outputs.versao }}"
+
+      - name: Publicar commit e tag
+        if: steps.plano.outputs.mudancas != '0' && steps.plano.outputs.tag_existe != 'true'
+        env:
+          VERSAO: ${{ steps.plano.outputs.versao }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md Cargo.toml Cargo.lock
+          git commit -m "chore(release): $VERSAO [skip ci]"
+          git tag -a "v$VERSAO" -m "v$VERSAO"
+          git push origin HEAD:main
+          git push origin "v$VERSAO"

@@ -6,12 +6,15 @@ Este repositório é uma base "template" de documentação para projetos com IA
 (veja o [README](/README.md)), então cada entrada descreve o efeito prático da
 mudança para quem copia esta base — não o detalhe técnico do commit.
 
-As entradas são escritas a partir das mensagens de commit, que seguem
-[Conventional Commits](https://www.conventionalcommits.org/pt-br/), e as versões
-seguem [Semantic Versioning](https://semver.org/lang/pt-BR/). Enquanto o
-versionamento automatizado na pipeline não estiver ativo, este arquivo é
-atualizado à mão a cada versão — daí a importância de escrever bem a mensagem
-de commit.
+O trecho entre os marcadores `changelog:inicio` e `changelog:fim` é **gerado
+automaticamente** pela pipeline a partir das mensagens de commit, que seguem
+[Conventional Commits](https://www.conventionalcommits.org/pt-br/) — não edite
+essa região à mão. O histórico abaixo do marcador final foi escrito à mão e não
+é regravado. As versões seguem
+[Semantic Versioning](https://semver.org/lang/pt-BR/).
+
+Para escrever um commit que apareça bem aqui, veja o
+[guia de contribuição](/CONTRIBUTING.md).
 
 ## Como ler
 
@@ -47,14 +50,29 @@ E o incremento de versão:
 
 ---
 
+<!-- changelog:inicio -->
+
 ## Não publicado
+
+### Novidades
+
+- **pipeline**: Adicionar o workflow `release`, que valida todo push e PR e
+  publica versão, changelog e tag `vX.Y.Z` após o merge em `main`.
+- **scripts**: Adicionar `scripts/changelog.rb`, gerador do changelog e
+  calculador da próxima versão a partir das mensagens de commit.
+- **scripts**: Adicionar `scripts/verificar-links.rb`, que verifica os links
+  internos dos arquivos Markdown.
 
 ### Documentação
 
-- Adicionado este registro de alterações, com o histórico do repositório até a
+- Adicionar este registro de alterações, com o histórico do repositório até a
   versão 0.1.0 e a convenção de escrita das próximas entradas.
+- Adicionar o guia de contribuição, com o padrão de mensagem de commit, o fluxo
+  de publicação e o checklist de ativação da pipeline.
 
 ---
+
+<!-- changelog:fim -->
 
 ## 0.1.0 — 2026-07-16
 

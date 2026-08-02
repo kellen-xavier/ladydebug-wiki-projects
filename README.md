@@ -28,7 +28,9 @@ Não técnico:
 
 ## Histórico
 
-O que mudou a cada versão está no [CHANGELOG](CHANGELOG.md).
+O que mudou a cada versão está no [CHANGELOG](CHANGELOG.md), gerado pela
+pipeline a partir das mensagens de commit. Antes de contribuir, veja o
+[guia de contribuição](CONTRIBUTING.md).
 
 ---
 
