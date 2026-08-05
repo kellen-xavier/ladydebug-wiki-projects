@@ -38,18 +38,20 @@ jobs:
           # Histórico e tags completos: o git-cliff compara com a última tag.
           fetch-depth: 0
 
-      - name: Compilar os binários
-        run: cargo build --release --locked
-
-      - name: Testes
-        run: cargo test --locked
-
+      # Antes do build: a verificação varre todos os `.md` do checkout, e assim
+      # não depende de `target/` continuar sem arquivos Markdown.
       - name: Links da documentação
         uses: gaurav-nelson/github-action-markdown-link-check@v1
         with:
           use-quiet-mode: "yes"
           use-verbose-mode: "yes"
           config-file: .github/workflows/mlc_config.json
+
+      - name: Compilar os binários
+        run: cargo build --release --locked
+
+      - name: Testes
+        run: cargo test --locked
 
       - uses: taiki-e/install-action@v2
         with:
