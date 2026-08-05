@@ -1,6 +1,6 @@
 # Manual de Publicação (Release) e Changelog — GitLab
 
-Como publicar uma nova versão da documentação e como o [CHANGELOG](/CHANGELOG.md) é gerado no **GitLab**. Complementa o [CONTRIBUTING](/CONTRIBUTING.md), que trata de *como contribuir*; aqui o assunto é *como publicar*.
+Como publicar uma nova versão da documentação e como o [CHANGELOG](CHANGELOG.md) é gerado no **GitLab**. Complementa o [CONTRIBUTING](CONTRIBUTING.md), que trata de *como contribuir*; aqui o assunto é *como publicar*.
 
 > Template. Os nomes de sistema (`sistema-a`, `sistema-b`...) e o nome de
 > repositório são exemplos — troque pelos do seu projeto.
@@ -162,8 +162,8 @@ GitLab isso é obrigatório, porque o push é feito com um token de usuário e
 
 Se cada MR editasse o `CHANGELOG.md`, **todo MR conflitaria com todo outro MR**
 no mesmo arquivo. Por isso há um único escritor: a `main`. Nos MRs a pipeline só
-mostra a prévia no log. Decisão registrada no
-[ADR 0004](/adr/0004-changelog-automatizado.md).
+mostra a prévia no log. Decisão ainda a registrar em ADR dedicado
+(`pendente-validacao`).
 
 ---
 
@@ -285,16 +285,16 @@ o `RELEASE_TOKEN` — mas confirme que o job consegue clonar o próprio projeto.
 | Versão subiu MINOR sem querer | `feat:` no título do MR (ou no corpo, em merge sem squash) | Revisar o título; exigir Squash |
 | Sempre sobe PATCH, nunca MINOR/MAJOR | Merge sem squash: assunto é `Merge branch...` | Exigir **Squash commits** (item 6.3) |
 | Pipeline entrou em loop | Commit de release sem `[skip ci]` | Garantir `[skip ci]` na mensagem do commit de release |
-| Entradas do changelog em *Outras alterações* | Mensagens fora do Conventional Commits | Ver [CONTRIBUTING](/CONTRIBUTING.md) |
+| Entradas do changelog em *Outras alterações* | Mensagens fora do Conventional Commits | Ver [CONTRIBUTING](CONTRIBUTING.md) |
 
 ---
 
 ## Referências
 
-- [CONTRIBUTING](/CONTRIBUTING.md) — como escrever commits que aparecem bem no changelog
-- [CHANGELOG](/CHANGELOG.md) — o resultado publicado
-- [ADR 0001](/adr/0001-versionamento-automatizado-pipeline.md) — versionamento automatizado
-- [ADR 0004](/adr/0004-changelog-automatizado.md) — decisões do changelog
+- [CONTRIBUTING](CONTRIBUTING.md) — como escrever commits que aparecem bem no changelog
+- [CHANGELOG](CHANGELOG.md) — o resultado publicado
+- [ADR 0001](adr/0001-versionamento-automatizado-pipeline.md) — versionamento automatizado
+- ADR de changelog automatizado — decisões do changelog (`pendente-validacao`: ainda não escrito)
 - [Conventional Commits](https://www.conventionalcommits.org/)
 - [Semantic Versioning](https://semver.org/)
 - [GitLab — Push to a protected branch from CI](https://docs.gitlab.com/ci/jobs/ci_job_token/)
