@@ -1,112 +1,37 @@
-# Registro de Alterações
+# Changelog
 
-O que mudou neste repositório a cada versão, da mais recente para a mais antiga.
+Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
-Este repositório é uma base "template" de documentação para projetos com IA
-(veja o [README](/README.md)), então cada entrada descreve o efeito prático da
-mudança para quem copia esta base — não o detalhe técnico do commit.
+O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
+e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
-O trecho entre os marcadores `changelog:inicio` e `changelog:fim` é **gerado
-automaticamente** pela pipeline a partir das mensagens de commit, que seguem
-[Conventional Commits](https://www.conventionalcommits.org/pt-br/) — não edite
-essa região à mão. O histórico abaixo do marcador final foi escrito à mão e não
-é regravado. As versões seguem
-[Semantic Versioning](https://semver.org/lang/pt-BR/).
+Este arquivo é gerado pela pipeline a partir das mensagens de commit — não edite
+à mão. Para escrever um commit que apareça bem aqui, veja o
+[guia de contribuição](CONTRIBUTING.md).
 
-Para escrever um commit que apareça bem aqui, veja o
-[guia de contribuição](/CONTRIBUTING.md).
+## [Não lançado]
 
-## Como ler
+### Adicionado
 
-| Seção | O que significa |
-| --- | --- |
-| Mudanças importantes | Alterou a forma de trabalhar; leia antes de seguir um procedimento antigo |
-| Novidades | Conteúdo, skill ou script novo no repositório |
-| Correções | Algo que estava errado e foi corrigido |
-| Documentação | Documento revisado, ampliado ou reorganizado |
-| Manutenção interna | Ajuste técnico sem efeito no conteúdo (estrutura de pastas, build, formatação) |
-| Outras alterações | Alteração cuja mensagem não seguiu o padrão de commit |
+- Add referencias ([d56ca28](https://github.com/kellen-xavier/ladydebug-wiki-projects/commit/d56ca28e731ff621de74c8419ef9f7ec49252a77))
+- Add skills para juntar pdfs ([b6c69b8](https://github.com/kellen-xavier/ladydebug-wiki-projects/commit/b6c69b8fe382e29e89034c996d553c11146e0afe))
+- Add script md2 to docx ([3b93a66](https://github.com/kellen-xavier/ladydebug-wiki-projects/commit/3b93a669ba2dfd16fbf186e563a3ebe38d29ccc6))
+- Alterar script para rust + ajustes na funcionalidade ([e29ecd8](https://github.com/kellen-xavier/ladydebug-wiki-projects/commit/e29ecd8b6aa5ae63fbfcf762cf2cadc40542e869))
 
-> **Não publicado** reúne o que já foi aprovado mas ainda não entrou em uma versão.
+### Modificado
 
-## Como a mensagem de commit vira uma entrada
+- Organização inicial repo ([336e821](https://github.com/kellen-xavier/ladydebug-wiki-projects/commit/336e821d3e9df494bb85cbbe59212a3638ccec0f))
+- Structure project folders ([84934bd](https://github.com/kellen-xavier/ladydebug-wiki-projects/commit/84934bd94c3f6c469ff095a3694d307487ef0236))
+- Adicionar CHANGELOG com historico do repositorio ([1e8e6ad](https://github.com/kellen-xavier/ladydebug-wiki-projects/commit/1e8e6ad8d8f77ecd8bf43edcb8982eaf9faac7bb))
+- Adicionar pipeline de versionamento e guia de contribuicao ([d288d5e](https://github.com/kellen-xavier/ladydebug-wiki-projects/commit/d288d5e25e2b63efc779036cb8eb7e28a67d0f5b))
 
-| Prefixo do commit | Seção onde aparece |
-| --- | --- |
-| `feat!:` ou `BREAKING CHANGE:` no corpo | Mudanças importantes |
-| `feat:` | Novidades |
-| `fix:` | Correções |
-| `docs:` | Documentação |
-| `chore:`, `refactor:` (ou `refact:`), `build:`, `ci:`, `test:` | Manutenção interna |
-| sem prefixo reconhecido | Outras alterações |
+### Corrigido
 
-E o incremento de versão:
+- Base para skill converter .docx para .pdf + mesclar arquivos .pdf sequencial ([8183992](https://github.com/kellen-xavier/ladydebug-wiki-projects/commit/8183992838077df815856130437b85c230e3c762))
+- Registrar docx_to_pdf no Cargo.toml e corrigir deteccao de sucesso ([3709d1d](https://github.com/kellen-xavier/ladydebug-wiki-projects/commit/3709d1dc17fe2b38e47e819d5f86e37a1d7f7efb))
 
-| Padrão de commit | Incremento |
-| --- | --- |
-| `BREAKING CHANGE:` ou `tipo!:` | MAJOR |
-| `feat:` | MINOR |
-| demais commits | PATCH |
+### Outras alterações
 
----
+- First wiki AI studies ([5f652da](https://github.com/kellen-xavier/ladydebug-wiki-projects/commit/5f652da5da941d0e6044baa4efbf2ac4efb8e9b3))
 
-<!-- changelog:inicio -->
 
-## Não publicado
-
-### Novidades
-
-- **pipeline**: Adicionar o workflow `release`, que valida todo push e PR e
-  publica versão, changelog e tag `vX.Y.Z` após o merge em `main`.
-- **scripts**: Adicionar `scripts/changelog.rb`, gerador do changelog e
-  calculador da próxima versão a partir das mensagens de commit.
-- **scripts**: Adicionar `scripts/verificar-links.rb`, que verifica os links
-  internos dos arquivos Markdown.
-
-### Documentação
-
-- Adicionar este registro de alterações, com o histórico do repositório até a
-  versão 0.1.0 e a convenção de escrita das próximas entradas.
-- Adicionar o guia de contribuição, com o padrão de mensagem de commit, o fluxo
-  de publicação e o checklist de ativação da pipeline.
-
----
-
-<!-- changelog:fim -->
-
-## 0.1.0 — 2026-07-16
-
-Estado inicial do repositório, anterior à adoção do registro de alterações.
-Reúne a base de estudo da wiki, as skills de agente e os scripts de conversão
-de documentos.
-
-### Novidades
-
-- Base inicial da wiki de estudos com IA, incluindo o esqueleto de navegação do
-  MkDocs (`mkdocs.yml`) e a arquitetura de referência da documentação.
-- Referências de estudo no README (Codex, regras de desenvolvimento e memória de
-  longo prazo para projetos).
-- Regras de agente do repositório em `AGENTS.md` e `.agents/AGENTS.md`, com o
-  fluxo obrigatório de revisão documental e os critérios mínimos de aceite.
-- Skill `juntar-pdfs` e o script `scripts/juntar_pdfs.rb`, para mesclar arquivos
-  PDF em sequência.
-- Skill `docx-to-pdf` e skill `wiki-writer`.
-- Skill `md2-to-docx` e o conversor de Markdown para DOCX em Rust
-  (`scripts/md2-to-docx.rs`), preservando conteúdo e indentação de forma
-  verbatim.
-- Conversor de DOCX para PDF reescrito em Rust (`scripts/docx_to_pdf.rs`),
-  substituindo a versão anterior da automação.
-
-### Correções
-
-- Base da skill de conversão `.docx` para `.pdf` e da mesclagem sequencial de
-  PDFs, que não funcionavam como descrito.
-- Registro do binário `docx_to_pdf` no `Cargo.toml` e correção da detecção de
-  sucesso da conversão, que reportava êxito mesmo quando o arquivo não era
-  gerado.
-
-### Manutenção interna
-
-- Organização inicial do repositório.
-- Reestruturação das pastas do projeto, separando `.agents/skills/`, `scripts/`
-  e `src/`.

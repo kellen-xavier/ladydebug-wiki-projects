@@ -1,14 +1,14 @@
 # Guia de Contribuição
 
 Como contribuir com este repositório e, principalmente, **como escrever um commit
-que apareça bem no [CHANGELOG](/CHANGELOG.md)**.
+que apareça bem no [CHANGELOG](CHANGELOG.md)**.
 
 Você não escreve o changelog à mão. Você escreve boas mensagens de commit e um
-bom título de Pull Request — o resto é gerado pela pipeline
-([`.github/workflows/release.yml`](/.github/workflows/release.yml)).
+bom título de Pull Request — o arquivo é gerado pela pipeline
+([`.github/workflows/release.yml`](.github/workflows/release.yml)).
 
 As regras de conteúdo e o fluxo de revisão documental estão no
-[AGENTS.md](/AGENTS.md); aqui o assunto é o fluxo de código e publicação.
+[AGENTS.md](AGENTS.md); aqui o assunto é o fluxo de código e publicação.
 
 ---
 
@@ -32,9 +32,29 @@ O job `version` roda **apenas em `main`** e **apenas fora de PR**. Merge em
 
 ---
 
-## 2. A mensagem de commit
+## 2. As ferramentas
 
-Use [Conventional Commits](https://www.conventionalcommits.org/pt-br/):
+Nenhuma delas é código deste repositório: são ferramentas de mercado,
+configuradas por arquivo.
+
+| Ferramenta | Para quê | Configuração |
+| --- | --- | --- |
+| [git-cliff](https://git-cliff.org) | Gera o CHANGELOG e calcula a próxima versão a partir dos commits | [`cliff.toml`](cliff.toml) |
+| [cargo-edit](https://github.com/killercup/cargo-edit) | `cargo set-version` atualiza `Cargo.toml` e `Cargo.lock` | — |
+| [markdown-link-check](https://github.com/marketplace/actions/markdown-link-checker) | Verifica os links dos `.md` | [`.github/workflows/mlc_config.json`](.github/workflows/mlc_config.json) |
+
+O `mlc_config.json` ignora links para o próprio repositório: as URLs de commit e
+de tag que o git-cliff gera apontam para objetos que só existem depois do push,
+e dariam 404 na verificação.
+
+---
+
+## 3. A mensagem de commit
+
+Use [Conventional Commits](https://www.conventionalcommits.org/pt-br/). O
+changelog segue o [Keep a Changelog 1.1.0](https://keepachangelog.com/pt-BR/1.1.0/),
+com datas em [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html)
+(`AAAA-MM-DD`).
 
 ```
 tipo(escopo opcional): descrição no imperativo
@@ -42,18 +62,24 @@ tipo(escopo opcional): descrição no imperativo
 corpo opcional explicando o porquê
 ```
 
-### Onde cada tipo aparece no changelog
+### Onde cada tipo aparece
 
-| Tipo | Seção do changelog | Incremento |
+| Tipo do commit | Seção do changelog | Incremento |
 | --- | --- | --- |
-| `feat!:` ou `BREAKING CHANGE:` no corpo | Mudanças importantes | MAJOR |
-| `feat:` | Novidades | MINOR |
-| `fix:` | Correções | PATCH |
-| `docs:` | Documentação | PATCH |
-| `chore:`, `refactor:`, `build:`, `ci:`, `test:`, `perf:`, `style:`, `revert:` | Manutenção interna | PATCH |
+| `feat:` | Adicionado | MINOR |
+| `fix:` | Corrigido | PATCH |
+| `docs:`, `refactor:`, `perf:`, `style:`, `build:`, `ci:`, `chore:`, `test:`, `revert:` | Modificado | PATCH |
+| `deprecate:` | Obsoleto | PATCH |
+| `remove:` | Removido | PATCH |
+| `security:` | Segurança | PATCH |
 | qualquer outra coisa | Outras alterações | PATCH |
+| `tipo!:` ou `BREAKING CHANGE:` no corpo | a seção do tipo, com o rótulo **Mudança importante** | MAJOR |
 
-> `refact:` também é aceito como sinônimo de `refactor:`, porque já foi usado no
+As seis primeiras seções são as do Keep a Changelog. *Outras alterações* existe
+para tornar visível o commit que não seguiu o padrão — se algo seu cair ali,
+melhore a mensagem antes do merge.
+
+> `refact:` é aceito como sinônimo de `refactor:`, porque já foi usado no
 > histórico do repositório — mas prefira `refactor:` em commits novos.
 
 ### Escreva pensando em quem vai ler a versão publicada
@@ -66,7 +92,7 @@ alguém decidindo se precisa mudar como trabalha — não é code review.
 | `fix: ajustes` | `fix: corrigir detecção de sucesso na conversão para PDF` |
 | `feat: novo script` | `feat: adicionar conversor de Markdown para DOCX` |
 | `docs: update` | `docs: documentar o fluxo de revisão do Projeto X` |
-| `wip` | qualquer coisa com um tipo válido (senão cai em *Outras alterações*) |
+| `wip` | qualquer coisa com um tipo válido |
 
 O escopo, quando existir, vira destaque na entrada:
 `feat(skills): adicionar skill wiki-writer` → **skills**: Adicionar skill wiki-writer.
@@ -80,7 +106,7 @@ um script novo não é.
 
 ---
 
-## 3. A Pull Request
+## 4. A Pull Request
 
 1. Abra a PR de `feature/...` para `develop`.
 2. Quando `develop` estiver pronta para publicar, abra a PR de `develop` para `main`.
@@ -90,68 +116,37 @@ um script novo não é.
 6. Use **Squash and merge**.
 
 O método de merge importa: no *squash*, o assunto do commit é o título da PR, e
-é esse assunto que a pipeline analisa. Com *merge commit*, o assunto vira
-`Merge pull request #N from ...` e a análise cairia sempre em PATCH.
+é esse assunto que o git-cliff analisa. Com *merge commit*, o assunto vira
+`Merge pull request #N from ...` — que o `cliff.toml` descarta, e a análise
+cairia sempre em PATCH.
 
 ---
 
-## 4. Rodar as verificações antes de abrir a PR
-
-São as mesmas do job `validate`:
+## 5. Rodar as verificações antes de abrir a PR
 
 ```bash
 cargo build --release --locked      # compila md2docx e docx_to_pdf
 cargo test --locked
-ruby -c scripts/changelog.rb        # sintaxe dos scripts Ruby
-ruby scripts/verificar-links.rb     # links internos dos .md
-ruby scripts/changelog.rb previa    # o que entraria na próxima versão
+
+cargo install git-cliff --locked    # uma vez
+git cliff --unreleased              # o que entraria na próxima versão
+git cliff --bumped-version          # qual seria a próxima versão
 ```
 
 A prévia imprime exatamente as entradas que irão para o changelog. Se alguma
 estiver em *Outras alterações* ou com texto ruim, ainda dá tempo de melhorar a
 mensagem de commit (`git commit --amend` ou `git rebase -i`).
 
----
-
-## 5. Como o changelog é gerado
-
-O [`scripts/changelog.rb`](/scripts/changelog.rb) usa só a biblioteca padrão do
-Ruby e o git — não há gems para instalar.
-
-| Comando | O que faz |
-| --- | --- |
-| `previa` | Mostra as entradas da próxima versão, sem escrever nada |
-| `plano` | Imprime `bump`, `versao`, `mudancas` e `tag_existe` (usado pela pipeline) |
-| `gerar X.Y.Z` | Regrava a região gerada do `CHANGELOG.md` |
-| `aplicar-versao X.Y.Z` | Atualiza a versão no `Cargo.toml` e no `Cargo.lock` |
-
-O script analisa os commits **desde a última tag `v*`** e só reescreve o trecho
-do `CHANGELOG.md` entre os marcadores `<!-- changelog:inicio -->` e
-`<!-- changelog:fim -->`. O histórico abaixo do marcador final é escrito à mão e
-nunca é tocado.
-
-A seção **Não publicado** é zerada a cada publicação — o que estava nela acabou
-de entrar na versão. Você pode preenchê-la à mão entre releases, mas não é
-obrigatório: a prévia mostra a mesma informação.
-
-Para forçar um incremento, use **Actions → release → Run workflow** e informe
-`version_bump` como `major`, `minor` ou `patch`. Isso ignora a análise das
-mensagens de commit.
+Para forçar um incremento numa publicação, use **Actions → release → Run
+workflow** e escolha `version_bump` como `major`, `minor` ou `patch`.
 
 ---
 
 ## 6. Ativação da pipeline
 
-Passos que precisam ser feitos **uma vez**, antes do primeiro release:
-
-- [ ] **Criar a tag base.** O repositório ainda não tem tags, e o gerador precisa
-      saber onde termina o histórico já publicado:
-
-      git tag -a v0.1.0 -m "v0.1.0" bc46338
-      git push origin v0.1.0
-
-      Sem isso, o `changelog.rb` para com uma mensagem explicando o que fazer,
-      em vez de republicar o histórico inteiro.
+O repositório ainda não tem tags: a primeira execução do job `version` publica a
+**v0.1.0** com todo o histórico e cria a tag. Não há passo manual de preparação —
+mas as permissões abaixo precisam estar em ordem, senão o push do release falha:
 
 - [ ] **Permissão de escrita**: `permissions: contents: write` já está no
       workflow. Confira também em *Settings → Actions → General → Workflow
@@ -180,16 +175,18 @@ que segura o loop.
 | Sintoma | Causa provável | Correção |
 | --- | --- | --- |
 | Job `version` não aparece | Evento é `pull_request`, ou a branch não é `main` | Esperado: só publica após o merge em `main` |
-| `changelog.rb` reclama de tag ausente | A tag base nunca foi criada | Item 6, primeiro passo |
-| `git push` rejeitado no release | `main` protegida sem bypass | Item 6, terceiro passo |
+| `git push` rejeitado no release | `main` protegida sem bypass | Item 6, segundo passo |
 | Sempre sobe PATCH, nunca MINOR | Merge por *merge commit* | Padronizar **Squash and merge** |
-| Entradas em *Outras alterações* | Mensagens fora do Conventional Commits | Seção 2 |
+| Entradas em *Outras alterações* | Mensagens fora do Conventional Commits | Seção 3 |
+| Link check falha em URL do próprio repo | Padrão de exceção desatualizado | `.github/workflows/mlc_config.json` |
 
 ---
 
 ## Referências
 
-- [CHANGELOG](/CHANGELOG.md) — o resultado publicado
-- [AGENTS.md](/AGENTS.md) — regras de documentação e fluxo de revisão
+- [CHANGELOG](CHANGELOG.md) — o resultado publicado
+- [AGENTS.md](AGENTS.md) — regras de documentação e fluxo de revisão
+- [Keep a Changelog 1.1.0](https://keepachangelog.com/pt-BR/1.1.0/)
+- [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html)
 - [Conventional Commits](https://www.conventionalcommits.org/pt-br/)
-- [Semantic Versioning](https://semver.org/lang/pt-BR/)
+- [Versionamento Semântico](https://semver.org/lang/pt-BR/)
