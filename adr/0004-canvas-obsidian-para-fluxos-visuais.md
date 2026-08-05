@@ -20,7 +20,7 @@ tags:
   - versionamento
 ---
 
-# ADR 0003 - Canvas do Obsidian para fluxos visuais
+## ADR 0003 - Canvas do Obsidian para fluxos visuais
 
 > Template de ADR. Os nomes de sistema (`sistema-a`, `sistema-b`, `sistema-c`...)
 > sao exemplos; substitua pelos do seu projeto.

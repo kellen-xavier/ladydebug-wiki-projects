@@ -14,7 +14,7 @@ tags:
   - versionamento
 ---
 
-# ADR 0001 - Versionamento automatizado na pipeline
+## ADR 0001 - Versionamento automatizado na pipeline
 
 > Template de ADR. Adapte comandos, nomes de branch e arquivos de manifesto ao
 > seu projeto.

@@ -20,7 +20,7 @@ tags:
   - wiki
 ---
 
-# ADR 0002 - Organizacao do repositorio orientada a dominio
+## ADR 0002 - Organizacao do repositorio orientada a dominio
 
 > Template de ADR. Os nomes de sistema (`sistema-a`, `sistema-b`, `sistema-c`...)
 > e os numeros de inventario sao exemplos ilustrativos. Substitua pelos do seu

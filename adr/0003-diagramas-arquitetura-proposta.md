@@ -15,7 +15,7 @@ tags:
   - diagrama
 ---
 
-# ADR 0002 - Diagramas da arquitetura proposta
+## ADR 0002 - Diagramas da arquitetura proposta
 
 > Template de ADR. Complemento visual do
 > [ADR 0002 - organizacao](0002-organizacao-orientada-a-dominio.md). Os nomes de
