@@ -2,6 +2,9 @@
   "ignorePatterns": [
     {
       "pattern": "^https://github\\.com/kellen-xavier/ladydebug-wiki-projects"
+    },
+    {
+      "pattern": "^https://www\\.iso\\.org/"
     }
   ],
   "aliveStatusCodes": [200, 206, 429],

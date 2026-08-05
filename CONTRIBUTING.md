@@ -43,9 +43,13 @@ configuradas por arquivo.
 | [cargo-edit](https://github.com/killercup/cargo-edit) | `cargo set-version` atualiza `Cargo.toml` e `Cargo.lock` | — |
 | [markdown-link-check](https://github.com/marketplace/actions/markdown-link-checker) | Verifica os links dos `.md` | [`.github/workflows/mlc_config.json`](.github/workflows/mlc_config.json) |
 
-O `mlc_config.json` ignora links para o próprio repositório: as URLs de commit e
-de tag que o git-cliff gera apontam para objetos que só existem depois do push,
-e dariam 404 na verificação.
+O `mlc_config.json` tem duas exceções, ambas por falso positivo:
+
+- **links para o próprio repositório** — as URLs de commit e de tag que o
+  git-cliff gera apontam para objetos que só existem depois do push, e dariam
+  404 na verificação;
+- **`www.iso.org`** — o site responde `403` a requisições automatizadas. O link
+  funciona no navegador; quem falha é o verificador.
 
 ---
 
