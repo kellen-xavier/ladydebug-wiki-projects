@@ -39,5 +39,7 @@ pipeline a partir das mensagens de commit. Antes de contribuir, veja o
 - [Documentação AI CODEX](https://developers.openai.com/)
 - [Rules OpenAI Dev](https://developers.openai.com/codex/rules)
 - [ai-memory: memória de longo prazo (Karpathy Wiki) e auto-aprendizado (Hermes) pros seus projetos](https://akitaonrails.com/2026/06/16/ai-memory-memoria-longo-prazo-karpathy-wiki-auto-aprendizado-hermes-projetos/)
+- [Changelog](https://keepachangelog.com/pt-BR/0.3.0/)
+- [JSON Canvas](https://jsoncanvas.org/) — formato dos mapas visuais
 
 ---
