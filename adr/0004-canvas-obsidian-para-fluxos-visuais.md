@@ -31,7 +31,7 @@ Proposto.
 
 ## Contexto
 
-A documentação já tem diagramas em Mermaid (ver [ADR 0002 - diagramas](/adr/0002-diagramas-arquitetura-proposta.md)),
+A documentação já tem diagramas em Mermaid (ver [ADR 0002 - diagramas](0003-diagramas-arquitetura-proposta.md)),
 que renderizam na wiki mas **não são navegáveis**: o leitor vê a caixa "Fluxo X"
 e ainda precisa procurar o arquivo correspondente na árvore.
 
@@ -41,10 +41,10 @@ especificação aberta, extensão `.canvas`, conteúdo JSON.
 
 Trazer esses mapas para o repositório esbarra em três regras vigentes:
 
-1. **Frontmatter obrigatório** ([CONTRIBUTING](/CONTRIBUTING.md)): todo documento
+1. **Frontmatter obrigatório** ([CONTRIBUTING](../CONTRIBUTING.md)): todo documento
    declara `title`, `version`, `status`, `owner`, `updated`. JSON não comporta
    frontmatter YAML.
-2. **Validação de links** ([ADR 0002 - organização](/adr/0002-organizacao-orientada-a-dominio.md)):
+2. **Validação de links** ([ADR 0002 - organização](0002-organizacao-orientada-a-dominio.md)):
    `scripts/validar-links.js` só varria `.md`. Um canvas cujo propósito é
    *apontar para arquivos* passaria sem nenhuma verificação — o pior caso, já
    que ele quebra silenciosamente a cada arquivo movido.
@@ -121,7 +121,7 @@ para o resto do repositório.
 
 ### Camada 1 — repositório (automática)
 
-Inalterada, conforme [ADR 0001](/adr/0001-versionamento-automatizado-pipeline.md):
+Inalterada, conforme [ADR 0001](0001-versionamento-automatizado-pipeline.md):
 o merge em `main` gera bump SemVer em manifesto e tag `vX.Y.Z` a partir da
 mensagem de commit. Canvas é arquivo versionado como qualquer outro.
 
