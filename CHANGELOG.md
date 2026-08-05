@@ -9,7 +9,7 @@ Este arquivo é gerado pela pipeline a partir das mensagens de commit — não e
 à mão. Para escrever um commit que apareça bem aqui, veja o
 [guia de contribuição](CONTRIBUTING.md).
 
-## [Não lançado]
+## [0.1.0] - 2026-08-05
 
 ### Adicionado
 
@@ -22,8 +22,14 @@ Este arquivo é gerado pela pipeline a partir das mensagens de commit — não e
 
 - Organização inicial repo ([336e821](https://github.com/kellen-xavier/ladydebug-wiki-projects/commit/336e821d3e9df494bb85cbbe59212a3638ccec0f))
 - Structure project folders ([84934bd](https://github.com/kellen-xavier/ladydebug-wiki-projects/commit/84934bd94c3f6c469ff095a3694d307487ef0236))
+- Add manual de release + arquivo do claude ([69da97e](https://github.com/kellen-xavier/ladydebug-wiki-projects/commit/69da97eb1881a269aad59a282265be3c28ef2c72))
 - Adicionar CHANGELOG com historico do repositorio ([1e8e6ad](https://github.com/kellen-xavier/ladydebug-wiki-projects/commit/1e8e6ad8d8f77ecd8bf43edcb8982eaf9faac7bb))
 - Adicionar pipeline de versionamento e guia de contribuicao ([d288d5e](https://github.com/kellen-xavier/ladydebug-wiki-projects/commit/d288d5e25e2b63efc779036cb8eb7e28a67d0f5b))
+- Substituir scripts proprios por git-cliff e markdown-link-check ([fafa4d8](https://github.com/kellen-xavier/ladydebug-wiki-projects/commit/fafa4d8def769d0b5832e6a9426e32cb996ab5cd))
+- Rodar o link check antes do build ([242960a](https://github.com/kellen-xavier/ladydebug-wiki-projects/commit/242960a0f8a0b2b06ca20c5f055c14e4b6e26450))
+- Corrigir link check e atualizar actions/checkout para v5 ([243bb3d](https://github.com/kellen-xavier/ladydebug-wiki-projects/commit/243bb3d0ebb0ffaf23117d47347ff048c0f8b602))
+- Add skills ([8e84c5c](https://github.com/kellen-xavier/ladydebug-wiki-projects/commit/8e84c5c832e89e978406dfe10e0bd29044f34343))
+- Corrigir links quebrados dos ADRs e manuais de release ([4d8ecd4](https://github.com/kellen-xavier/ladydebug-wiki-projects/commit/4d8ecd4b238bb945000dcf0e1e954e4891755cf2))
 
 ### Corrigido
 
@@ -34,4 +40,5 @@ Este arquivo é gerado pela pipeline a partir das mensagens de commit — não e
 
 - First wiki AI studies ([5f652da](https://github.com/kellen-xavier/ladydebug-wiki-projects/commit/5f652da5da941d0e6044baa4efbf2ac4efb8e9b3))
 
+[0.1.0]: https://github.com/kellen-xavier/ladydebug-wiki-projects/releases/tag/v0.1.0
 
