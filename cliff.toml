@@ -1,0 +1,113 @@
+# Configuração do git-cliff — https://git-cliff.org
+#
+# Gera o CHANGELOG.md a partir das mensagens de commit (Conventional Commits),
+# no formato Keep a Changelog 1.1.0 e com datas em ISO 8601 (AAAA-MM-DD).
+#
+# Uso local:
+#   git cliff --unreleased          prévia do que entraria na próxima versão
+#   git cliff --bumped-version      calcula a próxima versão (SemVer)
+#   git cliff --bump -o CHANGELOG.md   regrava o arquivo inteiro
+
+[changelog]
+header = """
+# Changelog
+
+Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
+
+O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
+e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
+
+Este arquivo é gerado pela pipeline a partir das mensagens de commit — não edite
+à mão. Para escrever um commit que apareça bem aqui, veja o
+[guia de contribuição](CONTRIBUTING.md).
+"""
+
+body = """
+{%- macro remote_url() -%}
+  https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}
+{%- endmacro -%}
+
+{% if version %}
+## [{{ version | trim_start_matches(pat="v") }}] - {{ timestamp | date(format="%Y-%m-%d") }}
+{%- else %}
+## [Não lançado]
+{%- endif %}
+{% for group, commits in commits | group_by(attribute="group") %}
+### {{ group | striptags | trim | upper_first }}
+{% for commit in commits %}
+- {% if commit.breaking %}**Mudança importante:** {% endif -%}
+  {% if commit.scope %}**{{ commit.scope }}**: {% endif -%}
+  {{ commit.message | upper_first }} \
+  ([{{ commit.id | truncate(length=7, end="") }}]({{ self::remote_url() }}/commit/{{ commit.id }}))
+{%- endfor %}
+{% endfor %}
+"""
+
+# Referências de link no rodapé, como pede o Keep a Changelog.
+# A quebra de linha explícita separa o rodapé da última entrada: `trim` remove
+# as linhas em branco literais do template.
+footer = """
+{{ "
+" }}
+{%- macro remote_url() -%}
+  https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}
+{%- endmacro -%}
+
+{% for release in releases -%}
+  {% if release.version -%}
+    {% if release.previous.version -%}
+      [{{ release.version | trim_start_matches(pat="v") }}]: \
+        {{ self::remote_url() }}/compare/{{ release.previous.version }}...{{ release.version }}
+    {% else -%}
+      [{{ release.version | trim_start_matches(pat="v") }}]: \
+        {{ self::remote_url() }}/releases/tag/{{ release.version }}
+    {% endif -%}
+  {% elif release.previous.version -%}
+    [Não lançado]: {{ self::remote_url() }}/compare/{{ release.previous.version }}...HEAD
+  {% endif -%}
+{% endfor %}
+"""
+
+trim = true
+
+[git]
+conventional_commits = true
+# Commits fora do padrão não são descartados: aparecem em "Outras alterações",
+# o que torna visível quem precisa melhorar a mensagem.
+filter_unconventional = false
+filter_commits = false
+protect_breaking_commits = true
+split_commits = false
+tag_pattern = "v[0-9]*"
+sort_commits = "oldest"
+topo_order = false
+
+# A ordem dos grupos segue o Keep a Changelog; o marcador <!-- n --> só serve
+# para ordenar e é removido do título pelo filtro `striptags` no template.
+commit_parsers = [
+  # Commits gerados pela própria pipeline e merges não viram entrada.
+  { message = "^chore\\(release\\)", skip = true },
+  { message = "^Merge", skip = true },
+  { message = "^feat", group = "<!-- 0 -->Adicionado" },
+  { message = "^(docs|doc)", group = "<!-- 1 -->Modificado" },
+  { message = "^(refactor|refact|perf|style|build|ci|chore|test|revert)", group = "<!-- 1 -->Modificado" },
+  { message = "^deprecat", group = "<!-- 2 -->Obsoleto" },
+  { message = "^(remove|removed)", group = "<!-- 3 -->Removido" },
+  { message = "^fix", group = "<!-- 4 -->Corrigido" },
+  { message = "^(security|sec)", group = "<!-- 5 -->Segurança" },
+  { message = "^.*", group = "<!-- 6 -->Outras alterações" },
+]
+
+[bump]
+# Alinha o incremento à ADR 0001, inclusive antes do 1.0.0: `feat` sobe MINOR e
+# uma mudança com `!` ou `BREAKING CHANGE:` sobe MAJOR.
+features_always_bump_minor = true
+breaking_always_bump_major = true
+# O repositório ainda não tem nenhuma tag: a primeira publicação será a v0.1.0,
+# mesma versão já declarada no Cargo.toml. Sem isto o padrão seria `0.1.0`, que
+# não casa com o `tag_pattern` acima.
+initial_tag = "v0.1.0"
+
+[remote.github]
+owner = "kellen-xavier"
+repo = "ladydebug-wiki-projects"
