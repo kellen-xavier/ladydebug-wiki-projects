@@ -3,11 +3,12 @@ name: pdf-toolkit
 description: >
   Executa operações com arquivos PDF: mesclar, dividir, girar páginas,
   extrair texto, extrair imagens, ver metadados, comprimir, proteger com
-  senha (criptografar), remover senha (descriptografar) e aplicar marca
-  d'água. Use esta skill sempre que o usuário mencionar um arquivo .pdf e
-  pedir para juntar, unir, separar, girar/rotacionar, extrair texto/tabelas
-  de, extrair imagens de, comprimir, proteger, descriptografar ou
-  carimbar/marcar um PDF.
+  senha (criptografar), remover senha (descriptografar), aplicar marca
+  d'água e preparar a leitura por tópicos de PDFs muito grandes (milhares
+  de páginas). Use esta skill sempre que o usuário mencionar um arquivo
+  .pdf e pedir para juntar, unir, separar, girar/rotacionar, extrair
+  texto/tabelas de, extrair imagens de, comprimir, proteger, descriptografar,
+  carimbar/marcar ou ler e resumir por tópicos um PDF muito extenso.
 ---
 
 # PDF Toolkit
@@ -39,7 +40,7 @@ script/
     merge.rs            extract_text.rs      encrypt.rs
     split.rs             extract_images.rs    decrypt.rs
     rotate.rs            metadata.rs          watermark.rs
-    compress.rs
+    compress.rs          read_large.rs
 ```
 
 Cada `commands/<nome>.rs` expõe `run_cmd(args)` e `print_help()` e não
@@ -68,6 +69,7 @@ cargo build --release
 | `encrypt`         | Protege o PDF com senha (AES-256)                 | `qpdf`       |
 | `decrypt`         | Remove a senha/criptografia de um PDF protegido   | `qpdf`       |
 | `watermark`       | Sobrepõe (ou coloca atrás) as páginas de outro PDF| `qpdf`       |
+| `read-large`      | Prepara PDFs muito grandes (milhares de páginas) para leitura por tópicos | `qpdf` + `pdftotext` |
 
 ## Uso
 
@@ -96,6 +98,10 @@ pdf_toolkit encrypt documento.pdf --user-password 123 --no-print --no-copy -o do
 pdf_toolkit decrypt documento_protegido.pdf --password 123 -o documento.pdf
 
 pdf_toolkit watermark contrato.pdf --stamp confidencial.pdf -o contrato_marcado.pdf
+
+pdf_toolkit read-large tomo-completo.pdf                       # so roda se tiver >= 3000 paginas
+pdf_toolkit read-large tomo-completo.pdf --chunk-pages 30       # blocos menores
+pdf_toolkit read-large processo.pdf --min-pages 800             # ajusta o limiar "grande"
 
 pdf_toolkit --help
 pdf_toolkit <comando> --help   # opções detalhadas de cada comando
@@ -131,6 +137,43 @@ antes de abortar — nenhum subcomando falha silenciosamente.
 - **`watermark`**: por padrão sobrepõe (`--overlay`); use `--underlay` para
   desenhar atrás do conteúdo original. O PDF de carimbo é repetido em todas
   as páginas de saída (`--repeat=1-z`).
+- **`read-large`**: só executa acima do limiar de páginas (`--min-pages`,
+  padrão 3000) — é deliberadamente exclusivo para PDFs muito grandes. Para
+  PDFs menores, o próprio comando recusa e aponta para `extract-text`. Ele
+  **não escreve o resumo**, apenas os insumos para a leitura em blocos (veja
+  a seção seguinte).
+
+## Leitura de PDFs muito grandes (por tópicos)
+
+Para PDFs com milhares de páginas, o texto completo não cabe em uma única
+leitura. `read-large` resolve a parte mecânica (dividir em blocos, extrair o
+outline nativo); montar os tópicos e o sumário é trabalho de compreensão de
+conteúdo, feito por quem está executando a skill ao ler os blocos — não pelo
+script.
+
+Fluxo:
+
+1. **Gerar os blocos**: `pdf_toolkit read-large arquivo.pdf`. Cria
+   `<nome>_leitura/` com:
+   - `manifest.md` — índice dos blocos, na ordem de leitura, com o intervalo
+     de páginas de cada um;
+   - `outline.json` — marcadores/sumário nativo do PDF, se existir (saída
+     bruta de `qpdf --json --json-key=outlines`, para ler diretamente);
+   - `chunks/<nome>_pNNNNN-NNNNN.txt` — texto de cada intervalo de páginas
+     (via `pdftotext -layout`).
+2. **Ler `manifest.md` e `outline.json`** primeiro: se o PDF já tem
+   marcadores, eles dão a estrutura de tópicos de graça.
+3. **Ler os blocos de `chunks/` em ordem**, um de cada vez. Como o conteúdo
+   total não cabe em uma janela só, mantenha durante a leitura uma lista
+   corrente e compacta de tópicos/subtópicos (título + intervalo de páginas
+   + 1-2 frases), sem guardar o texto bruto de blocos já processados.
+4. **Escrever o resultado** em `leitura-<nome-do-pdf>-resumo.md`, no
+   diretório de trabalho atual, com pelo menos:
+   - título, arquivo de origem, total de páginas;
+   - um **sumário** (lista dos tópicos encontrados, com o intervalo de
+     páginas de cada um);
+   - uma **seção por tópico**, com um resumo do conteúdo e a página onde
+     aparece.
 
 ## Limitações
 

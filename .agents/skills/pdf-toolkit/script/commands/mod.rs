@@ -8,6 +8,7 @@ pub mod extract_images;
 pub mod extract_text;
 pub mod merge;
 pub mod metadata;
+pub mod read_large;
 pub mod rotate;
 pub mod split;
 pub mod watermark;
