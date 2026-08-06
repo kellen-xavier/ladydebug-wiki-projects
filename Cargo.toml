@@ -14,7 +14,7 @@ path = "scripts/docx_to_pdf.rs"
 
 [[bin]]
 name = "pdf_toolkit"
-path = "scripts/pdf_toolkit.rs"
+path = ".agents/skills/pdf-toolkit/script/main.rs"
 
 [dependencies]
 zip = { version = "0.6", default-features = false, features = ["deflate"] }

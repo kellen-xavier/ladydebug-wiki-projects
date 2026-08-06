@@ -24,10 +24,28 @@ o formato PDF**: ele orquestra ferramentas maduras e amplamente testadas —
 `qpdf`, `poppler-utils` (`pdftotext`/`pdfimages`/`pdfinfo`) e `ghostscript` —
 validando entradas e relatando o resultado.
 
-## Script: `scripts/pdf_toolkit.rs`
+## Script: `script/`
 
-Programa Rust autocontido (**apenas a `std`**, sem crates externos). Um único
-binário com subcomandos, no mesmo espírito do `docx_to_pdf.rs`.
+Programa Rust autocontido (**apenas a `std`**, sem crates externos), dividido
+em módulos curtos e objetivos — um arquivo por subcomando — no mesmo espírito
+dos scripts individuais do [skill de referência](https://github.com/anthropics/skills/tree/main/skills/pdf/scripts):
+
+```
+script/
+  main.rs              # CLI: parseia o subcomando e despacha
+  common.rs            # logging, detecção de ferramentas, execução de processos
+  commands/
+    mod.rs
+    merge.rs            extract_text.rs      encrypt.rs
+    split.rs             extract_images.rs    decrypt.rs
+    rotate.rs            metadata.rs          watermark.rs
+    compress.rs
+```
+
+Cada `commands/<nome>.rs` expõe `run_cmd(args)` e `print_help()` e não
+ultrapassa ~125 linhas. `common.rs` reúne apenas o que é compartilhado entre
+os subcomandos (logging, verificação de ferramentas externas no PATH,
+execução de processos, helpers de caminho).
 
 ## Build (uma vez)
 
