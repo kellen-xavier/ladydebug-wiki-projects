@@ -12,6 +12,10 @@ path = "scripts/md2-to-docx.rs"
 name = "docx_to_pdf"
 path = "scripts/docx_to_pdf.rs"
 
+[[bin]]
+name = "pdf_toolkit"
+path = "scripts/pdf_toolkit.rs"
+
 [dependencies]
 zip = { version = "0.6", default-features = false, features = ["deflate"] }
 
