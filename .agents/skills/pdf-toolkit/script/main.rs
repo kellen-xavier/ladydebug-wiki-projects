@@ -35,7 +35,8 @@ mod common;
 use std::env;
 
 use commands::{
-    compress, decrypt, encrypt, extract_images, extract_text, merge, metadata, read_large, rotate, split, watermark,
+    compress, decrypt, encrypt, extract_images, extract_text, inventory, merge, metadata, rasterize, read_large,
+    rotate, split, watermark,
 };
 use common::error;
 
@@ -53,6 +54,8 @@ fn print_help() {
          \x20 encrypt         Protege um PDF com senha\n\
          \x20 decrypt         Remove a senha de um PDF\n\
          \x20 watermark       Aplica marca d'agua em um PDF\n\
+         \x20 inventory       Levanta inventario de conteudo e sugere estrategia de leitura\n\
+         \x20 rasterize       Converte paginas do PDF em imagens (PNG/JPEG)\n\
          \x20 read-large      Prepara um PDF muito grande para leitura por topicos\n\n\
          Use 'pdf_toolkit <comando> --help' para detalhes de cada comando."
     );
@@ -79,6 +82,8 @@ fn main() {
         "encrypt" => encrypt::run_cmd(rest),
         "decrypt" => decrypt::run_cmd(rest),
         "watermark" => watermark::run_cmd(rest),
+        "inventory" => inventory::run_cmd(rest),
+        "rasterize" => rasterize::run_cmd(rest),
         "read-large" => read_large::run_cmd(rest),
         "-h" | "--help" => {
             print_help();

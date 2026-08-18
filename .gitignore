@@ -1,2 +1,11 @@
 # Rust build artifacts
 /target
+
+## Rust dependency files
+/Cargo.lock
+
+## Pastas com dados de teste, modelos e domínios que não devem ser versionados
+/src/dominios/**
+/src/modelos/**
+.agents/references/**
+.agents/skills/gerar-docx-padrao/**

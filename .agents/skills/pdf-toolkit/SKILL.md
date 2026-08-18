@@ -1,52 +1,73 @@
 ---
 name: pdf-toolkit
 description: >
-  Executa operações com arquivos PDF: mesclar, dividir, girar páginas,
-  extrair texto, extrair imagens, ver metadados, comprimir, proteger com
-  senha (criptografar), remover senha (descriptografar), aplicar marca
-  d'água e preparar a leitura por tópicos de PDFs muito grandes (milhares
-  de páginas). Use esta skill sempre que o usuário mencionar um arquivo
-  .pdf e pedir para juntar, unir, separar, girar/rotacionar, extrair
-  texto/tabelas de, extrair imagens de, comprimir, proteger, descriptografar,
-  carimbar/marcar ou ler e resumir por tópicos um PDF muito extenso.
+  Executa operações de manipulação de arquivo PDF: mesclar, dividir, girar
+  páginas, extrair texto, extrair imagens, ver metadados, comprimir,
+  proteger com senha (criptografar), remover senha (descriptografar) e
+  aplicar marca d'água. Use esta skill sempre que o usuário mencionar um
+  arquivo .pdf e pedir para juntar, unir, separar, girar/rotacionar,
+  extrair texto/tabelas de, extrair imagens de, comprimir, proteger,
+  descriptografar ou carimbar/marcar um PDF. Para ler e resumir um PDF
+  muito extenso (1.000+ páginas), use a skill `pdf-leitura-extensa`.
 ---
 
 # PDF Toolkit
 
+## Índice
+
+- [Visão Geral](#visão-geral)
+- [Script: `script/`](#script-script)
+- [Build (uma vez)](#build-uma-vez)
+- [Comandos](#comandos)
+- [Pré-requisitos](#pré-requisitos)
+- [Referências](#referências)
+
 ## Visão Geral
 
-Kit de linha de comando para as operações mais comuns com PDF, baseado no
-skill oficial [`pdf`](https://github.com/anthropics/skills/tree/main/skills/pdf)
-da Anthropic, porém reimplementado em **Rust** para seguir o padrão deste
+Kit de linha de comando para as operações mais comuns de **manipulação**
+de PDF, baseado no skill oficial
+[`pdf`](https://github.com/anthropics/skills/tree/main/skills/pdf) da
+Anthropic, porém reimplementado em **Rust** para seguir o padrão deste
 repositório (binário único, portável, sem runtime Python).
 
-Assim como `docx_to_pdf.rs` e `juntar_pdfs.rb`, o programa **não reimplementa
-o formato PDF**: ele orquestra ferramentas maduras e amplamente testadas —
-`qpdf`, `poppler-utils` (`pdftotext`/`pdfimages`/`pdfinfo`) e `ghostscript` —
-validando entradas e relatando o resultado.
+Assim como `docx_to_pdf.rs` e `juntar_pdfs.rb`, o programa **não
+reimplementa o formato PDF**: ele orquestra ferramentas maduras e
+amplamente testadas — `qpdf`, `poppler-utils`
+(`pdftotext`/`pdfimages`/`pdfinfo`) e `ghostscript` — validando entradas e
+relatando o resultado.
+
+Esta skill cobre só manipulação de arquivo. Ler e resumir um PDF muito
+grande (milhares de páginas) é a skill irmã **`pdf-leitura-extensa`** —
+mesmo binário `pdf_toolkit`, subcomandos diferentes (`inventory`,
+`read-large`, `rasterize`); a fronteira entre as duas skills é de
+contexto (o que o agente carrega para cada tarefa), não de compilação.
 
 ## Script: `script/`
 
-Programa Rust autocontido (**apenas a `std`**, sem crates externos), dividido
-em módulos curtos e objetivos — um arquivo por subcomando — no mesmo espírito
-dos scripts individuais do [skill de referência](https://github.com/anthropics/skills/tree/main/skills/pdf/scripts):
+Programa Rust autocontido (**apenas a `std`**, sem crates externos),
+dividido em módulos curtos e objetivos — um arquivo por subcomando — no
+mesmo espírito dos scripts individuais do
+[skill de referência](https://github.com/anthropics/skills/tree/main/skills/pdf/scripts):
 
 ```
 script/
   main.rs              # CLI: parseia o subcomando e despacha
-  common.rs            # logging, detecção de ferramentas, execução de processos
+  common.rs            # logging, deteccao de ferramentas, execucao de processos
   commands/
     mod.rs
     merge.rs            extract_text.rs      encrypt.rs
     split.rs             extract_images.rs    decrypt.rs
     rotate.rs            metadata.rs          watermark.rs
-    compress.rs          read_large.rs
+    compress.rs          inventory.rs         rasterize.rs
+    read_large.rs
 ```
 
 Cada `commands/<nome>.rs` expõe `run_cmd(args)` e `print_help()` e não
-ultrapassa ~125 linhas. `common.rs` reúne apenas o que é compartilhado entre
-os subcomandos (logging, verificação de ferramentas externas no PATH,
-execução de processos, helpers de caminho).
+ultrapassa ~125 linhas. `common.rs` reúne apenas o que é compartilhado
+entre os subcomandos (logging, verificação de ferramentas externas no
+PATH, execução de processos, helpers de caminho). `inventory.rs`,
+`read_large.rs` e `rasterize.rs` também vivem aqui — mesmo binário —
+mas sua documentação de uso fica na skill `pdf-leitura-extensa`.
 
 ## Build (uma vez)
 
@@ -57,139 +78,47 @@ cargo build --release
 
 ## Comandos
 
-| Comando          | Faz                                              | Ferramenta   |
-|-------------------|---------------------------------------------------|--------------|
-| `merge`           | Mescla vários PDFs em um só, na ordem informada   | `qpdf`       |
-| `split`           | Divide um PDF (por página ou por intervalos)      | `qpdf`       |
-| `rotate`          | Gira páginas em múltiplos de 90°                  | `qpdf`       |
-| `extract-text`    | Extrai o texto do PDF (com ou sem layout)         | `pdftotext`  |
-| `extract-images`  | Extrai as imagens embutidas no PDF                | `pdfimages`  |
-| `metadata`        | Exibe título, autor, nº de páginas, criptografia…  | `pdfinfo`    |
-| `compress`        | Reduz o tamanho comprimindo imagens embutidas     | `ghostscript`|
-| `encrypt`         | Protege o PDF com senha (AES-256)                 | `qpdf`       |
-| `decrypt`         | Remove a senha/criptografia de um PDF protegido   | `qpdf`       |
-| `watermark`       | Sobrepõe (ou coloca atrás) as páginas de outro PDF| `qpdf`       |
-| `read-large`      | Prepara PDFs muito grandes (milhares de páginas) para leitura por tópicos | `qpdf` + `pdftotext` |
+| Comando | Faz | Ferramenta |
+|---|---|---|
+| `merge` | Mescla vários PDFs em um só, na ordem informada | `qpdf` |
+| `split` | Divide um PDF (por página ou por intervalos) | `qpdf` |
+| `rotate` | Gira páginas em múltiplos de 90° | `qpdf` |
+| `extract-text` | Extrai o texto do PDF (com ou sem layout) | `pdftotext` |
+| `extract-images` | Extrai as imagens embutidas no PDF | `pdfimages` |
+| `metadata` | Exibe título, autor, nº de páginas, criptografia… | `pdfinfo` |
+| `compress` | Reduz o tamanho comprimindo imagens embutidas | `ghostscript` |
+| `encrypt` | Protege o PDF com senha (AES-256) | `qpdf` |
+| `decrypt` | Remove a senha/criptografia de um PDF protegido | `qpdf` |
+| `watermark` | Sobrepõe (ou coloca atrás) as páginas de outro PDF | `qpdf` |
 
-## Uso
+Flags detalhadas de cada comando, com exemplos:
+[`reference/comandos.md`](reference/comandos.md).
+
+Para `inventory`, `read-large` e `rasterize` (leitura de PDF extenso), veja
+a skill **`pdf-leitura-extensa`** — o `--help` de cada um também funciona
+normalmente (`pdf_toolkit read-large --help`).
 
 ```bash
-pdf_toolkit merge a.pdf b.pdf c.pdf -o merged.pdf
-
-pdf_toolkit split relatorio.pdf                          # 1 arquivo por página
-pdf_toolkit split relatorio.pdf --ranges "1-5,6-10"       # por intervalo
-
-pdf_toolkit rotate scan.pdf --degrees 90 -o scan_girado.pdf
-pdf_toolkit rotate scan.pdf --degrees -90 --pages 2,4-6 -o scan_girado.pdf
-
-pdf_toolkit extract-text contrato.pdf -o contrato.txt
-pdf_toolkit extract-text contrato.pdf --layout -o contrato.txt
-
-pdf_toolkit extract-images laudo.pdf --output-dir laudo_imagens
-
-pdf_toolkit metadata documento.pdf
-
-pdf_toolkit compress grande.pdf -o grande_comprimido.pdf
-pdf_toolkit compress grande.pdf --quality screen -o grande_web.pdf
-
-pdf_toolkit encrypt documento.pdf --user-password 123 -o documento_protegido.pdf
-pdf_toolkit encrypt documento.pdf --user-password 123 --no-print --no-copy -o documento_protegido.pdf
-
-pdf_toolkit decrypt documento_protegido.pdf --password 123 -o documento.pdf
-
-pdf_toolkit watermark contrato.pdf --stamp confidencial.pdf -o contrato_marcado.pdf
-
-pdf_toolkit read-large tomo-completo.pdf                       # so roda se tiver >= 3000 paginas
-pdf_toolkit read-large tomo-completo.pdf --chunk-pages 30       # blocos menores
-pdf_toolkit read-large processo.pdf --min-pages 800             # ajusta o limiar "grande"
-
 pdf_toolkit --help
-pdf_toolkit <comando> --help   # opções detalhadas de cada comando
+pdf_toolkit <comando> --help   # opcoes detalhadas de cada comando
 ```
 
 ## Pré-requisitos
 
 ```bash
 sudo apt install qpdf poppler-utils ghostscript   # Debian / Ubuntu
-brew install qpdf poppler ghostscript             # macOS
-choco install qpdf poppler ghostscript            # Windows
 ```
 
-| Ferramenta      | Função                                                        |
-|-----------------|-----------------------------------------------------------------|
-| `qpdf`          | Mesclar, dividir, girar, criptografar/descriptografar, marca d'água |
-| `poppler-utils` | Extrair texto (`pdftotext`), imagens (`pdfimages`) e metadados (`pdfinfo`) |
-| `ghostscript`   | Comprimir PDFs reduzindo a resolução das imagens embutidas    |
-| Rust stdlib     | Nenhum crate externo necessário                                |
+Detalhes por SO, tabela ferramenta → comando, e as limitações do toolkit
+em relação ao skill original (tabelas, criação de PDF do zero, OCR,
+formulários): [`reference/pre-requisitos.md`](reference/pre-requisitos.md).
 
-Se uma ferramenta faltar, o programa informa exatamente qual e como instalar
-antes de abortar — nenhum subcomando falha silenciosamente.
+## Referências
 
-## Comportamentos Importantes
-
-- **Não-destrutivo por construção**: cada comando lê a entrada e escreve uma
-  saída nova; o arquivo original nunca é sobrescrito por padrão.
-- **`split` sem `--ranges`**: gera um PDF por página, numerado
-  (`<nome>_p1.pdf`, `<nome>_p2.pdf`, ...), dentro de `<nome>_split/`.
-- **`rotate` sem `--pages`**: aplica a rotação a todas as páginas.
-- **`encrypt`**: usa AES-256 (`qpdf --encrypt ... 256`); se apenas
-  `--user-password` for informado, a senha de dono usa o mesmo valor.
-- **`watermark`**: por padrão sobrepõe (`--overlay`); use `--underlay` para
-  desenhar atrás do conteúdo original. O PDF de carimbo é repetido em todas
-  as páginas de saída (`--repeat=1-z`).
-- **`read-large`**: só executa acima do limiar de páginas (`--min-pages`,
-  padrão 3000) — é deliberadamente exclusivo para PDFs muito grandes. Para
-  PDFs menores, o próprio comando recusa e aponta para `extract-text`. Ele
-  **não escreve o resumo**, apenas os insumos para a leitura em blocos (veja
-  a seção seguinte).
-
-## Leitura de PDFs muito grandes (por tópicos)
-
-Para PDFs com milhares de páginas, o texto completo não cabe em uma única
-leitura. `read-large` resolve a parte mecânica (dividir em blocos, extrair o
-outline nativo); montar os tópicos e o sumário é trabalho de compreensão de
-conteúdo, feito por quem está executando a skill ao ler os blocos — não pelo
-script.
-
-Fluxo:
-
-1. **Gerar os blocos**: `pdf_toolkit read-large arquivo.pdf`. Cria
-   `<nome>_leitura/` com:
-   - `manifest.md` — índice dos blocos, na ordem de leitura, com o intervalo
-     de páginas de cada um;
-   - `outline.json` — marcadores/sumário nativo do PDF, se existir (saída
-     bruta de `qpdf --json --json-key=outlines`, para ler diretamente);
-   - `chunks/<nome>_pNNNNN-NNNNN.txt` — texto de cada intervalo de páginas
-     (via `pdftotext -layout`).
-2. **Ler `manifest.md` e `outline.json`** primeiro: se o PDF já tem
-   marcadores, eles dão a estrutura de tópicos de graça.
-3. **Ler os blocos de `chunks/` em ordem**, um de cada vez. Como o conteúdo
-   total não cabe em uma janela só, mantenha durante a leitura uma lista
-   corrente e compacta de tópicos/subtópicos (título + intervalo de páginas
-   + 1-2 frases), sem guardar o texto bruto de blocos já processados.
-4. **Escrever o resultado** em `leitura-<nome-do-pdf>-resumo.md`, no
-   diretório de trabalho atual, com pelo menos:
-   - título, arquivo de origem, total de páginas;
-   - um **sumário** (lista dos tópicos encontrados, com o intervalo de
-     páginas de cada um);
-   - uma **seção por tópico**, com um resumo do conteúdo e a página onde
-     aparece.
-
-## Limitações
-
-Em relação ao skill original (que usa `pypdf`/`pdfplumber`/`reportlab`/`pytesseract`
-em Python), este toolkit cobre as operações de manipulação de arquivo mas
-**não** cobre, por não terem uma ferramenta de linha de comando equivalente
-confiável sem trazer dependências pesadas:
-
-- **Extração estruturada de tabelas** (equivalente a `pdfplumber.extract_tables`):
-  use `extract-text --layout`, que preserva colunas/espaçamento como texto simples.
-- **Criação de PDF do zero** (equivalente a `reportlab`): gere o conteúdo em
-  Markdown/DOCX e use a skill `docx-to-pdf` para produzir o PDF.
-- **OCR de PDFs escaneados** (equivalente a `pytesseract`/`pdf2image`): requer
-  `tesseract` + `ocrmypdf`; não incluído por não estarem entre as ferramentas
-  já usadas neste repositório. Se necessário, peça para adicionar um
-  subcomando `ocr` que os invoque.
-- **Preenchimento de formulários PDF** (equivalente ao `FORMS.md` do skill
-  original): `qpdf` não edita campos de formulário; requer `pdftk` ou uma
-  biblioteca dedicada. Peça se isso vira necessário.
+- [`reference/comandos.md`](reference/comandos.md) — flags detalhadas dos
+  10 comandos de manipulação, com exemplos de uso.
+- [`reference/pre-requisitos.md`](reference/pre-requisitos.md) —
+  instalação por SO, tabela ferramenta → comando, limitações conhecidas.
+- Skill `pdf-leitura-extensa` — leitura e resumo de PDFs muito extensos
+  (1.000+ páginas), incluindo o caso de PDF escaneado (sem camada de
+  texto).

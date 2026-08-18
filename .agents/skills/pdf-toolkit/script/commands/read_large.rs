@@ -7,19 +7,20 @@
 //! compreensao do conteudo, que e trabalho de quem le os blocos gerados (o
 //! agente), nao deste script. Ele so prepara os insumos, na ordem correta,
 //! para que essa leitura caiba em blocos gerenciaveis. Veja o fluxo completo
-//! em SKILL.md, secao "Leitura de PDFs muito grandes".
+//! na skill `pdf-leitura-extensa`.
 
 use std::fs;
 use std::path::PathBuf;
 
 use crate::common::{error, log, ok, require_file, require_tool, run, stem_of, usage_err, warn};
 
-const DEFAULT_MIN_PAGES: u32 = 3000;
+const DEFAULT_MIN_PAGES: u32 = 1000;
 const DEFAULT_CHUNK_PAGES: u32 = 50;
 
 pub fn run_cmd(args: &[String]) -> i32 {
     let mut input: Option<String> = None;
     let mut output_dir: Option<String> = None;
+    let mut to_dir: Option<String> = None;
     let mut min_pages = DEFAULT_MIN_PAGES;
     let mut chunk_pages = DEFAULT_CHUNK_PAGES;
 
@@ -29,6 +30,10 @@ pub fn run_cmd(args: &[String]) -> i32 {
             "-o" | "--output-dir" => {
                 i += 1;
                 output_dir = args.get(i).cloned();
+            }
+            "--to" => {
+                i += 1;
+                to_dir = args.get(i).cloned();
             }
             "--min-pages" => {
                 i += 1;
@@ -57,6 +62,10 @@ pub fn run_cmd(args: &[String]) -> i32 {
             other => return usage_err("read-large", &format!("Argumento inesperado: {other}")),
         }
         i += 1;
+    }
+
+    if output_dir.is_some() && to_dir.is_some() {
+        return usage_err("read-large", "Use apenas uma opcao: --output-dir ou --to.");
     }
 
     let input = match input {
@@ -98,8 +107,21 @@ pub fn run_cmd(args: &[String]) -> i32 {
     }
 
     let stem = stem_of(&input_path);
-    let out_dir = PathBuf::from(output_dir.unwrap_or_else(|| format!("{stem}_leitura")));
-    let chunks_dir = out_dir.join("chunks");
+    // Com --to, os blocos vao direto para o diretorio informado (ex.:
+    // src/dominios/<nome-projeto>/arquivos-texto/), sem subpasta "chunks/",
+    // para casar com a regra do AGENTS.md de ler os .md de arquivos-texto
+    // via ripgrep. Sem --to, mantem a estrutura padrao <nome>_leitura/chunks/.
+    let (out_dir, chunks_dir) = match to_dir {
+        Some(dir) => {
+            let d = PathBuf::from(dir);
+            (d.clone(), d)
+        }
+        None => {
+            let out_dir = PathBuf::from(output_dir.unwrap_or_else(|| format!("{stem}_leitura")));
+            let chunks_dir = out_dir.join("chunks");
+            (out_dir, chunks_dir)
+        }
+    };
     if let Err(e) = fs::create_dir_all(&chunks_dir) {
         error(&format!("Nao foi possivel criar {}: {e}", chunks_dir.display()));
         return 1;
@@ -126,8 +148,11 @@ pub fn run_cmd(args: &[String]) -> i32 {
     let mut start = 1u32;
     while start <= npages {
         let end = (start + chunk_pages - 1).min(npages);
-        let file_name = format!("{stem}_p{start:05}-{end:05}.txt");
+        let file_name = format!("{stem}_p{start:05}-{end:05}.md");
         let chunk_file = chunks_dir.join(&file_name);
+        // "-" como arquivo de saida manda o pdftotext escrever no stdout, em
+        // vez de num .txt: assim da para inserir a ancora de pagina
+        // (`<!-- pagina: N -->`) entre as paginas antes de gravar o .md.
         let pargs = vec![
             "-layout".to_string(),
             "-f".to_string(),
@@ -135,11 +160,27 @@ pub fn run_cmd(args: &[String]) -> i32 {
             "-l".to_string(),
             end.to_string(),
             input.clone(),
-            chunk_file.to_string_lossy().into_owned(),
+            "-".to_string(),
         ];
-        let (success, _stdout, stderr) = run("pdftotext", &pargs);
+        let (success, page_stdout, stderr) = run("pdftotext", &pargs);
         if success {
-            chunks.push((start, end, file_name));
+            // pdftotext separa paginas por form-feed (0x0C); uma ancora por
+            // pagina deixa um hit de ripgrep carregar o numero da pagina.
+            let mut md = String::new();
+            for (offset, page_text) in page_stdout.split('\u{0C}').enumerate() {
+                let page_num = start + offset as u32;
+                if page_num > end {
+                    break;
+                }
+                md.push_str(&format!("<!-- pagina: {page_num} -->\n\n"));
+                md.push_str(page_text.trim_end());
+                md.push_str("\n\n");
+            }
+            if let Err(e) = fs::write(&chunk_file, md) {
+                warn(&format!("  falha ao escrever {}: {e}", chunk_file.display()));
+            } else {
+                chunks.push((start, end, file_name));
+            }
         } else {
             warn(&format!("  falha nas paginas {start}-{end}: {}", stderr.trim()));
         }
@@ -163,8 +204,9 @@ pub fn run_cmd(args: &[String]) -> i32 {
     ));
     manifest.push_str("## Blocos, em ordem de leitura\n\n");
     manifest.push_str("| # | Paginas | Arquivo |\n|---|---------|---------|\n");
+    let chunks_rel = if chunks_dir == out_dir { "" } else { "chunks/" };
     for (idx, (s, e, name)) in chunks.iter().enumerate() {
-        manifest.push_str(&format!("| {} | {s}-{e} | `chunks/{name}` |\n", idx + 1));
+        manifest.push_str(&format!("| {} | {s}-{e} | `{chunks_rel}{name}` |\n", idx + 1));
     }
 
     let manifest_path = out_dir.join("manifest.md");
@@ -185,13 +227,17 @@ pub fn print_help() {
     println!(
         "Uso: pdf_toolkit read-large arquivo.pdf [opcoes]\n\n\
          Prepara um PDF muito grande para leitura organizada por topicos:\n\
-         divide o texto em blocos por pagina e extrai o outline nativo do\n\
-         PDF (se existir). Nao gera o resumo — apenas os insumos para que\n\
-         a leitura seja feita em blocos. Exclusivo para PDFs com pelo menos\n\
-         --min-pages paginas (padrao: {DEFAULT_MIN_PAGES}); para PDFs menores,\n\
-         use 'pdf_toolkit extract-text'.\n\n\
+         divide o texto em blocos .md por pagina (com ancora '<!-- pagina: N -->'\n\
+         antes do texto de cada pagina) e extrai o outline nativo do PDF (se\n\
+         existir). Nao gera o resumo — apenas os insumos para que a leitura\n\
+         seja feita em blocos. Exclusivo para PDFs com pelo menos --min-pages\n\
+         paginas (padrao: {DEFAULT_MIN_PAGES}); para PDFs menores, use\n\
+         'pdf_toolkit extract-text'.\n\n\
          Opcoes:\n\
          \x20 -o, --output-dir DIR   Diretorio de saida (padrao: <nome>_leitura/)\n\
+         \x20     --to DIR           Escreve manifest/outline/blocos direto em DIR,\n\
+         \x20                        sem subpasta chunks/ (ex.: arquivos-texto/ do\n\
+         \x20                        projeto). Exclusivo com --output-dir.\n\
          \x20     --chunk-pages N    Paginas por bloco de texto (padrao: {DEFAULT_CHUNK_PAGES})\n\
          \x20     --min-pages N      Paginas minimas exigidas (padrao: {DEFAULT_MIN_PAGES})\n\
          \x20 -h, --help             Exibe esta ajuda"
