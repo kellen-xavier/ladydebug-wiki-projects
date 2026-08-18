@@ -1,13 +1,21 @@
 ---
 name: wiki-writer
-description: Use esta skill quando a tarefa envolver criação, revisão ou reorganização de páginas da wiki em Markdown para públicos técnicos e não técnicos.
+description: >
+  Cria, revisa ou reorganiza páginas da wiki do projeto em Markdown
+  (`docs/`), transformando conhecimento técnico bruto em documentação
+  clara e rastreável — sempre com objetivo, contexto, público-alvo e
+  fonte declarados, e sem transformar hipótese em fato. Use esta skill
+  sempre que o usuário pedir para documentar, escrever, atualizar,
+  revisar, organizar ou reestruturar uma página da wiki ou um documento
+  de negócio/processo/arquitetura em `docs/`, ou pedir para adaptar
+  conteúdo técnico para um público não técnico.
 ---
 
 # Wiki Writer
 
 ## Objetivo
 
-Transformar conhecimento técnico bruto em documentação clara, rastreável e útil.
+Transformar conhecimento técnico bruto em documentação clara, rastreável e útil para organizar e guardar as informações do diretório `/docs` do repositório.
 
 ## Regras
 

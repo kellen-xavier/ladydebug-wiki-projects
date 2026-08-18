@@ -6,11 +6,19 @@ description = "Converte Markdown para DOCX preservando conteudo e indentacao (ve
 
 [[bin]]
 name = "md2docx"
-path = "scripts/md2-to-docx.rs"
+path = ".agents/skills/md2-to-docx/script/md2-to-docx.rs"
 
 [[bin]]
 name = "docx_to_pdf"
-path = "scripts/docx_to_pdf.rs"
+path = ".agents/skills/docx-to-pdf/script/docx_to_pdf.rs"
+
+[[bin]]
+name = "pdf_toolkit"
+path = ".agents/skills/pdf-toolkit/script/main.rs"
+
+[[bin]]
+name = "verificar_docx"
+path = ".agents/skills/gerar-docx-padrao/script/verificar_docx.rs"
 
 [dependencies]
 zip = { version = "0.6", default-features = false, features = ["deflate"] }

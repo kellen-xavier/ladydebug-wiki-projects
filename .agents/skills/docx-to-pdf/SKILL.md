@@ -12,6 +12,16 @@ description: >
 
 # DOCX para PDF
 
+## Índice
+
+- [Visão Geral](#visão-geral)
+- [Script: `script/docx_to_pdf.rs`](#script-scriptdocx_to_pdfrs)
+- [Build (uma vez)](#build-uma-vez)
+- [Uso](#uso)
+- [Pré-requisitos](#pré-requisitos)
+- [Comportamentos Importantes](#comportamentos-importantes)
+- [Limitações](#limitações)
+
 ## Visão Geral
 
 Converte `.docx` em PDF com **alta fidelidade de layout**, delegando a
@@ -25,25 +35,26 @@ renderização ao LibreOffice (o mesmo motor que abre o documento no editor).
 **Não-destrutivo por construção**: o programa apenas **lê** o `.docx` e **escreve**
 um `.pdf` novo. A origem nunca é movida, renomeada ou regravada.
 
-## Script: `scripts/docx_to_pdf.rs`
+## Script: `script/docx_to_pdf.rs`
 
 Programa Rust autocontido, **sem dependências externas** (apenas a `std`). Um
 único binário, portável entre sistemas. Mesmo padrão do `md2-to-docx.rs`.
 
 ## Build (uma vez)
 
-Via Cargo (padrão do repositório) — o alvo já está registrado no `Cargo.toml`:
+Via Cargo, se o projeto tiver um `Cargo.toml` registrando este binário
+(ver exemplo em `[[bin]]` de um `Cargo.toml` na raiz do repositório):
 
 ```bash
 cargo build --release
-# binário em: target/release/docx_to_pdf  (~412 KB)
+# binário em: target/release/docx_to_pdf
 ```
 
 Como este conversor não tem dependências, também pode ser compilado direto,
 sem Cargo (informe a edition usada pelo projeto):
 
 ```bash
-rustc -O --edition 2021 scripts/docx_to_pdf.rs -o docx_to_pdf
+rustc -O --edition 2021 script/docx_to_pdf.rs -o docx_to_pdf
 ```
 
 ## Uso

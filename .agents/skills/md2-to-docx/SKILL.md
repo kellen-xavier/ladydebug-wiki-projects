@@ -1,6 +1,9 @@
-# md2docx
+---
+name: md2-to-docx
+description: Converte um arquivo Markdown (`.md`) em `.docx` preservando 100% do conteúdo e da indentação do arquivo original.
+---
 
-Converte um arquivo Markdown (`.md`) em `.docx` **preservando 100% do conteúdo e da indentação** do arquivo original.
+# md2-to-docx
 
 ## Comportamento
 
@@ -14,20 +17,20 @@ Sem dependências pesadas — só o crate `zip`. Um `.docx` é apenas um ZIP com
 
 ```bash
 cargo build --release
-# binário em: target/release/md2docx  (~415 KB)
+# binário em: target/release/md2-to-docx  (~415 KB)
 ```
 
 ## Uso
 
 ```bash
-md2docx <entrada.md> [saida.docx]
+md2-to-docx <entrada.md> [saida.docx]
 ```
 
 - Saída omitida → mesmo caminho da entrada com extensão `.docx`.
 
 ```bash
-md2docx SKILL.md              # -> SKILL.docx
-md2docx notas.md out/nota.docx
+md2-to-docx SKILL.md              # -> SKILL.docx
+md2-to-docx notas.md out/nota.docx
 ```
 
 ## Notas
