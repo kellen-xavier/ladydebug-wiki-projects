@@ -1,2 +1,5 @@
 # Rust build artifacts
 /target
+
+# Configuracao local do agente de imagem (contem caminhos da maquina do usuario)
+/.agents/config/imagem-agents.json

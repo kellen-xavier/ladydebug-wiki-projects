@@ -1,0 +1,44 @@
+{
+  "_leia_me": [
+    "Copie este arquivo para .agents/config/imagem-agents.json e ajuste ao seu ambiente.",
+    "O arquivo real e ignorado pelo Git: ele descreve a SUA maquina, nao o repositorio.",
+    "NUNCA coloque chave de API aqui. O comando herda o ambiente do seu shell,",
+    "entao exporte a chave (ex.: export OPENAI_API_KEY=...) antes de rodar.",
+    "Placeholders disponiveis: {prompt} {prompt_arquivo} {saida} {largura} {altura}",
+    "prompt_via: arquivo | argumento | stdin   -   saida_via: arquivo | stdout"
+  ],
+  "agent_padrao": "cli-local",
+  "agents": {
+    "cli-local": {
+      "descricao": "wrapper proprio do usuario que recebe o prompt em arquivo e grava a imagem",
+      "comando": ["meu-gerador", "--prompt-file", "{prompt_arquivo}", "--out", "{saida}", "--width", "{largura}", "--height", "{altura}"],
+      "prompt_via": "arquivo",
+      "saida_via": "arquivo",
+      "timeout_s": 300
+    },
+    "agent-stdin": {
+      "descricao": "agente que le o prompt na entrada padrao e devolve os bytes da imagem na saida padrao",
+      "comando": ["meu-agent", "gerar-imagem", "--size", "{largura}x{altura}"],
+      "prompt_via": "stdin",
+      "saida_via": "stdout",
+      "timeout_s": 300
+    },
+    "agent-argumento": {
+      "descricao": "agente que recebe o prompt como argumento de linha de comando",
+      "comando": ["meu-agent", "--prompt", "{prompt}", "--output", "{saida}"],
+      "prompt_via": "argumento",
+      "saida_via": "arquivo",
+      "timeout_s": 300
+    },
+    "comfy-local": {
+      "descricao": "exemplo de difusao local (ComfyUI/Automatic1111) via script proprio",
+      "comando": ["python3", "$HOME/comfy/gerar.py", "--prompt-file", "{prompt_arquivo}", "--out", "{saida}", "--w", "{largura}", "--h", "{altura}"],
+      "prompt_via": "arquivo",
+      "saida_via": "arquivo",
+      "env": {
+        "COMFY_WORKFLOW": "spec-para-imagem.json"
+      },
+      "timeout_s": 900
+    }
+  }
+}
